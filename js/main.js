@@ -209,3 +209,108 @@ function renderProjects(category) {
 
 // Inicializa o app
 document.addEventListener('DOMContentLoaded', init);
+
+// 3. LÓGICA DO SLIDER DE PROJETOS
+function initSliders() {
+    const sliders = document.querySelectorAll('.project-slider');
+    
+    sliders.forEach(slider => {
+        const slides = slider.querySelectorAll('.slide');
+        const prevBtn = slider.querySelector('.prev-btn');
+        const nextBtn = slider.querySelector('.next-btn');
+        const dots = slider.querySelectorAll('.dot');
+        let currentSlide = 0;
+        
+        if (slides.length === 0) return;
+
+        function goToSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            if(dots[currentSlide]) dots[currentSlide].classList.remove('active');
+            
+            currentSlide = (n + slides.length) % slides.length;
+            
+            slides[currentSlide].classList.add('active');
+            if(dots[currentSlide]) dots[currentSlide].classList.add('active');
+        }
+        
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => goToSlide(currentSlide - 1));
+        }
+        
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => goToSlide(currentSlide + 1));
+        }
+        
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => goToSlide(index));
+        });
+    });
+}
+
+// 4. LÓGICA DO LIGHTBOX (EXPANSÃO DE IMAGENS)
+function initLightbox() {
+    let lightbox = document.getElementById('lightbox');
+    
+    if (!lightbox) {
+        lightbox = document.createElement('div');
+        lightbox.id = 'lightbox';
+        lightbox.innerHTML = `
+            <button class="lightbox-btn lightbox-prev">❮</button>
+            <div class="lightbox-content">
+                <button class="lightbox-close">&times;</button>
+                <img class="lightbox-img" src="" alt="Imagem Expandida">
+            </div>
+            <button class="lightbox-btn lightbox-next">❯</button>
+        `;
+        document.body.appendChild(lightbox);
+        
+        const closeBtn = lightbox.querySelector('.lightbox-close');
+        const prevBtn = lightbox.querySelector('.lightbox-prev');
+        const nextBtn = lightbox.querySelector('.lightbox-next');
+        const lightboxImg = lightbox.querySelector('.lightbox-img');
+
+        closeBtn.addEventListener('click', () => {
+            lightbox.classList.remove('active');
+        });
+        
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) {
+                lightbox.classList.remove('active');
+            }
+        });
+
+        function showLightboxImage(index) {
+            const currentImgs = Array.from(document.querySelectorAll('.slide-grid img'));
+            if (currentImgs.length === 0) return;
+            lightbox.currentIndex = (index + currentImgs.length) % currentImgs.length;
+            lightboxImg.src = currentImgs[lightbox.currentIndex].src;
+        }
+
+        prevBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            showLightboxImage(lightbox.currentIndex - 1);
+        });
+        
+        nextBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            showLightboxImage(lightbox.currentIndex + 1);
+        });
+
+        lightbox._showImage = showLightboxImage;
+        lightbox.currentIndex = 0;
+    }
+
+    const imgs = document.querySelectorAll('.slide-grid img');
+    imgs.forEach((img, index) => {
+        img.style.cursor = 'pointer';
+        img.addEventListener('click', () => {
+            lightbox._showImage(index);
+            lightbox.classList.add('active');
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initSliders();
+    initLightbox();
+});
