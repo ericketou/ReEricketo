@@ -607,6 +607,32 @@ footer {
 }
 
 /* ==========================================
+   LAYOUT VERTICAL SPLIT (Projetos em Pé)
+   ========================================== */
+.vertical-project-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 5rem;
+    align-items: start;
+    margin-top: 2rem;
+}
+
+.vertical-project-layout .vertical-cover {
+    aspect-ratio: 9/16;
+    height: 80vh;
+    max-height: 850px;
+    margin-bottom: 0;
+    position: sticky;
+    top: 120px;
+    background: transparent;
+    margin: 0 auto;
+}
+
+.vertical-project-layout .project-header {
+    margin-bottom: 3rem;
+}
+
+/* ==========================================
    8. RESPONSIVO
    ========================================== */
 @media (max-width: 992px) {
@@ -639,6 +665,19 @@ footer {
 
     .filters {
         width: 100%;
+    }
+
+    .vertical-project-layout {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+
+    .vertical-project-layout .vertical-cover {
+        position: static;
+        height: auto;
+        max-height: 70vh;
+        width: 100%;
+        margin-bottom: 2rem;
     }
 
     .hero {
