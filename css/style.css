@@ -619,8 +619,9 @@ footer {
 
 .vertical-project-layout .vertical-cover {
     aspect-ratio: 9/16;
-    height: 80vh;
-    max-height: 850px;
+    width: 100%;
+    max-width: 360px; /* Largura máxima para parecer um celular */
+    height: auto;
     margin-bottom: 0;
     position: sticky;
     top: 120px;
@@ -630,6 +631,14 @@ footer {
 
 .vertical-project-layout .project-header {
     margin-bottom: 3rem;
+}
+
+.sidebar-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+    margin-bottom: 2rem;
 }
 
 /* ==========================================
@@ -674,10 +683,12 @@ footer {
 
     .vertical-project-layout .vertical-cover {
         position: static;
-        height: auto;
-        max-height: 70vh;
-        width: 100%;
+        max-width: 100%;
         margin-bottom: 2rem;
+    }
+
+    .sidebar-split {
+        grid-template-columns: 1fr;
     }
 
     .hero {
