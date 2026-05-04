@@ -25,15 +25,15 @@ const projetos = [
         link: "./edicao-video/horizontal/check-in-pet/index.html"
     },
     {
-        id: "reels-dinamico",
-        titulo: "Reels Dinâmico",
+        id: "quarentena-pets",
+        titulo: "Quarentena de Pets",
         categoria: "Edição de vídeo",
-        ferramentas: "After Effects, CapCut",
-        desc_curta: "Edição vertical de alto impacto para retenção no Instagram e TikTok.",
+        ferramentas: "Premiere, After Effects, Illustrator",
+        desc_curta: "Projeto focado em clareza informativa e design funcional com animação visual direta.",
         destaque: false,
         ativo: true,
         formato: "vertical",
-        thumb: "./edicao-video/vertical/reels-dinamico/assets/thumb.jpg",
+        thumb: "./assets/img/R_QUARENTENA.png",
         link: "./edicao-video/vertical/reels-dinamico/index.html"
     },
     {
