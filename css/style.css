@@ -903,3 +903,20 @@ footer {
 .lightbox-next {
     right: 2rem;
 }
+
+/* ==========================================
+   11. DESKTOP E MOBILE SLIDERS
+   ========================================== */
+.mobile-slider {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .desktop-slider {
+        display: none;
+    }
+    
+    .mobile-slider {
+        display: flex;
+    }
+}

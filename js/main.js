@@ -45,7 +45,7 @@ const projetos = [
         destaque: false,
         ativo: true,
         formato: "horizontal",
-        thumb: "./fotografia/ensaio-retrato/assets/thumb.jpg",
+        thumb: "./fotografia/ensaio-retrato/assets/img_capa_fotografia_01.png",
         link: "./fotografia/ensaio-retrato/index.html"
     },
     {
@@ -213,34 +213,34 @@ document.addEventListener('DOMContentLoaded', init);
 // 3. LÓGICA DO SLIDER DE PROJETOS
 function initSliders() {
     const sliders = document.querySelectorAll('.project-slider');
-    
+
     sliders.forEach(slider => {
         const slides = slider.querySelectorAll('.slide');
         const prevBtn = slider.querySelector('.prev-btn');
         const nextBtn = slider.querySelector('.next-btn');
         const dots = slider.querySelectorAll('.dot');
         let currentSlide = 0;
-        
+
         if (slides.length === 0) return;
 
         function goToSlide(n) {
             slides[currentSlide].classList.remove('active');
-            if(dots[currentSlide]) dots[currentSlide].classList.remove('active');
-            
+            if (dots[currentSlide]) dots[currentSlide].classList.remove('active');
+
             currentSlide = (n + slides.length) % slides.length;
-            
+
             slides[currentSlide].classList.add('active');
-            if(dots[currentSlide]) dots[currentSlide].classList.add('active');
+            if (dots[currentSlide]) dots[currentSlide].classList.add('active');
         }
-        
+
         if (prevBtn) {
             prevBtn.addEventListener('click', () => goToSlide(currentSlide - 1));
         }
-        
+
         if (nextBtn) {
             nextBtn.addEventListener('click', () => goToSlide(currentSlide + 1));
         }
-        
+
         dots.forEach((dot, index) => {
             dot.addEventListener('click', () => goToSlide(index));
         });
@@ -250,7 +250,7 @@ function initSliders() {
 // 4. LÓGICA DO LIGHTBOX (EXPANSÃO DE IMAGENS)
 function initLightbox() {
     let lightbox = document.getElementById('lightbox');
-    
+
     if (!lightbox) {
         lightbox = document.createElement('div');
         lightbox.id = 'lightbox';
@@ -263,7 +263,7 @@ function initLightbox() {
             <button class="lightbox-btn lightbox-next">❯</button>
         `;
         document.body.appendChild(lightbox);
-        
+
         const closeBtn = lightbox.querySelector('.lightbox-close');
         const prevBtn = lightbox.querySelector('.lightbox-prev');
         const nextBtn = lightbox.querySelector('.lightbox-next');
@@ -272,7 +272,7 @@ function initLightbox() {
         closeBtn.addEventListener('click', () => {
             lightbox.classList.remove('active');
         });
-        
+
         lightbox.addEventListener('click', (e) => {
             if (e.target === lightbox) {
                 lightbox.classList.remove('active');
@@ -280,7 +280,7 @@ function initLightbox() {
         });
 
         function showLightboxImage(index) {
-            const currentImgs = Array.from(document.querySelectorAll('.slide-grid img'));
+            const currentImgs = Array.from(document.querySelectorAll('.slide-grid img')).filter(img => img.offsetParent !== null);
             if (currentImgs.length === 0) return;
             lightbox.currentIndex = (index + currentImgs.length) % currentImgs.length;
             lightboxImg.src = currentImgs[lightbox.currentIndex].src;
@@ -290,7 +290,7 @@ function initLightbox() {
             e.stopPropagation();
             showLightboxImage(lightbox.currentIndex - 1);
         });
-        
+
         nextBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             showLightboxImage(lightbox.currentIndex + 1);
@@ -301,11 +301,15 @@ function initLightbox() {
     }
 
     const imgs = document.querySelectorAll('.slide-grid img');
-    imgs.forEach((img, index) => {
+    imgs.forEach((img) => {
         img.style.cursor = 'pointer';
         img.addEventListener('click', () => {
-            lightbox._showImage(index);
-            lightbox.classList.add('active');
+            const currentVisibleImgs = Array.from(document.querySelectorAll('.slide-grid img')).filter(i => i.offsetParent !== null);
+            const visibleIndex = currentVisibleImgs.indexOf(img);
+            if (visibleIndex !== -1) {
+                lightbox._showImage(visibleIndex);
+                lightbox.classList.add('active');
+            }
         });
     });
 }
