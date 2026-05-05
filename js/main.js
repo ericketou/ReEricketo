@@ -49,7 +49,7 @@ const projetos = [
         link: "./fotografia/ensaio-retrato/index.html"
     },
     {
-        id: "logo-animada",
+        id: "ABA_MOTION_001",
         titulo: "Logo Animada",
         categoria: "Motion design",
         ferramentas: "After Effects, Illustrator",
@@ -57,8 +57,20 @@ const projetos = [
         destaque: false,
         ativo: true,
         formato: "horizontal",
-        thumb: "./motion-design/logo-animada/assets/thumb.jpg",
-        link: "./motion-design/logo-animada/index.html"
+        thumb: "./motion-design/ABA_MOTION_001/assets/ABA-001_MOTION_004.gif",
+        link: "./motion-design/ABA_MOTION_001/index.html"
+    },
+    {
+        id: "ABA_FOTOS_002",
+        titulo: "Fotos na pista do Analhafranco",
+        categoria: "Fotografia",
+        ferramentas: "Lightroom, Canon SL2,",
+        desc_curta: "Algumas fotografias que fiz durante o dia no analhafranco.",
+        destaque: false,
+        ativo: true,
+        formato: "horizontal",
+        thumb: "./fotografia/ABA_FOTOS_002/assets/img_capa_fotografia_01.png",
+        link: "./fotografia/ABA_FOTOS_002/index.html"
     },
     {
         id: "set-fotografico",
