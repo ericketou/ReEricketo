@@ -186,7 +186,7 @@ nav {
 .hero p {
     font-size: clamp(1.1rem, 2vw, 1.3rem);
     color: var(--text-secondary);
-    max-width: 600px;
+    max-width: 900px;
     font-weight: 300;
     line-height: 1.6;
 }
@@ -764,6 +764,12 @@ footer {
     .slide-grid {
         gap: 0.5rem;
         padding: 0.5rem 2.5rem;
+    }
+    .slide-info {
+        display: none !important;
+    }
+    .slide-media {
+        flex: 1 1 100% !important;
     }
 }
 
