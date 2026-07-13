@@ -232,18 +232,38 @@ function initSliders() {
         const nextBtn = slider.querySelector('.next-btn');
         const dots = slider.querySelectorAll('.dot');
         let currentSlide = 0;
+        let startX = 0;
+        let endX = 0;
 
         if (slides.length === 0) return;
 
-        function goToSlide(n) {
-            slides[currentSlide].classList.remove('active');
-            if (dots[currentSlide]) dots[currentSlide].classList.remove('active');
-
-            currentSlide = (n + slides.length) % slides.length;
-
-            slides[currentSlide].classList.add('active');
-            if (dots[currentSlide]) dots[currentSlide].classList.add('active');
+        function setActiveSlide(index) {
+            slides.forEach((slide, slideIndex) => {
+                const isActive = slideIndex === index;
+                slide.classList.toggle('active', isActive);
+                if (dots[slideIndex]) {
+                    dots[slideIndex].classList.toggle('active', isActive);
+                }
+            });
         }
+
+        function goToSlide(n) {
+            currentSlide = (n + slides.length) % slides.length;
+            setActiveSlide(currentSlide);
+        }
+
+        function handleSwipe() {
+            const deltaX = endX - startX;
+            if (Math.abs(deltaX) < 50) return;
+            if (deltaX < 0) {
+                goToSlide(currentSlide + 1);
+            } else {
+                goToSlide(currentSlide - 1);
+            }
+        }
+
+        slider._setActiveSlide = setActiveSlide;
+        slider._goToSlide = goToSlide;
 
         if (prevBtn) {
             prevBtn.addEventListener('click', () => goToSlide(currentSlide - 1));
@@ -256,10 +276,22 @@ function initSliders() {
         dots.forEach((dot, index) => {
             dot.addEventListener('click', () => goToSlide(index));
         });
+
+        slider.addEventListener('touchstart', (event) => {
+            if (event.touches.length === 1) {
+                startX = event.touches[0].clientX;
+            }
+        }, { passive: true });
+
+        slider.addEventListener('touchend', (event) => {
+            if (event.changedTouches.length === 0) return;
+            endX = event.changedTouches[0].clientX;
+            handleSwipe();
+        }, { passive: true });
     });
 }
 
-// 4. LÓGICA DO LIGHTBOX (EXPANSÃO DE IMAGENS)
+// 4. LÓGICA DO LIGHTBOX (EXPANSÃO DE IMAGENS E VÍDEOS)
 function initLightbox() {
     let lightbox = document.getElementById('lightbox');
 
@@ -270,57 +302,127 @@ function initLightbox() {
             <button class="lightbox-btn lightbox-prev">❮</button>
             <div class="lightbox-content">
                 <button class="lightbox-close">&times;</button>
-                <img class="lightbox-img" src="" alt="Imagem Expandida">
+                <div class="lightbox-media"></div>
             </div>
             <button class="lightbox-btn lightbox-next">❯</button>
         `;
         document.body.appendChild(lightbox);
-
-        const closeBtn = lightbox.querySelector('.lightbox-close');
-        const prevBtn = lightbox.querySelector('.lightbox-prev');
-        const nextBtn = lightbox.querySelector('.lightbox-next');
-        const lightboxImg = lightbox.querySelector('.lightbox-img');
-
-        closeBtn.addEventListener('click', () => {
-            lightbox.classList.remove('active');
-        });
-
-        lightbox.addEventListener('click', (e) => {
-            if (e.target === lightbox) {
-                lightbox.classList.remove('active');
-            }
-        });
-
-        function showLightboxImage(index) {
-            const currentImgs = Array.from(document.querySelectorAll('.slide-grid img')).filter(img => img.offsetParent !== null);
-            if (currentImgs.length === 0) return;
-            lightbox.currentIndex = (index + currentImgs.length) % currentImgs.length;
-            lightboxImg.src = currentImgs[lightbox.currentIndex].src;
-        }
-
-        prevBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            showLightboxImage(lightbox.currentIndex - 1);
-        });
-
-        nextBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            showLightboxImage(lightbox.currentIndex + 1);
-        });
-
-        lightbox._showImage = showLightboxImage;
-        lightbox.currentIndex = 0;
     }
 
-    const imgs = document.querySelectorAll('.slide-grid img');
-    imgs.forEach((img) => {
-        img.style.cursor = 'pointer';
-        img.addEventListener('click', () => {
-            const currentVisibleImgs = Array.from(document.querySelectorAll('.slide-grid img')).filter(i => i.offsetParent !== null);
-            const visibleIndex = currentVisibleImgs.indexOf(img);
+    const closeBtn = lightbox.querySelector('.lightbox-close');
+    const prevBtn = lightbox.querySelector('.lightbox-prev');
+    const nextBtn = lightbox.querySelector('.lightbox-next');
+    const lightboxMedia = lightbox.querySelector('.lightbox-media');
+
+    function stopActiveVideo() {
+        const activeVideo = lightboxMedia.querySelector('video');
+        if (activeVideo) {
+            activeVideo.pause();
+            activeVideo.currentTime = 0;
+        }
+    }
+
+    function getSliderContext(mediaItem) {
+        const parentSlider = mediaItem.closest('.project-slider');
+        const mediaList = parentSlider
+            ? Array.from(parentSlider.querySelectorAll('.slide .slide-grid img, .slide .slide-grid video'))
+            : Array.from(document.querySelectorAll('.slide .slide-grid img, .slide .slide-grid video'));
+        const parentSlide = mediaItem.closest('.slide');
+        const slides = parentSlider ? parentSlider.querySelectorAll('.slide') : document.querySelectorAll('.slide');
+        const slideIndex = parentSlide ? Array.from(slides).indexOf(parentSlide) : 0;
+
+        return { mediaList, parentSlider, slideIndex };
+    }
+
+    closeBtn.addEventListener('click', () => {
+        lightbox.classList.remove('active');
+        stopActiveVideo();
+    });
+
+    lightbox.addEventListener('click', (e) => {
+        const content = lightbox.querySelector('.lightbox-content');
+        if (e.target === lightbox || e.target === content || e.target === lightbox.querySelector('.lightbox-media')) {
+            lightbox.classList.remove('active');
+            stopActiveVideo();
+        }
+    });
+
+    function showLightboxMedia(index, context) {
+        const currentMedia = context?.mediaList || lightbox.currentContext?.mediaList || [];
+        if (currentMedia.length === 0) return;
+
+        lightbox.currentContext = context || lightbox.currentContext || { mediaList: currentMedia };
+        lightbox.currentIndex = (index + currentMedia.length) % currentMedia.length;
+        const media = currentMedia[lightbox.currentIndex];
+        const isVideo = media.tagName.toLowerCase() === 'video';
+
+        if (lightbox.currentContext.parentSlider && lightbox.currentContext.parentSlider._setActiveSlide) {
+            const mediaSlide = media.closest('.slide');
+            const slides = lightbox.currentContext.parentSlider.querySelectorAll('.slide');
+            const targetSlideIndex = mediaSlide ? Array.from(slides).indexOf(mediaSlide) : lightbox.currentContext.slideIndex || 0;
+            lightbox.currentContext.parentSlider._setActiveSlide(targetSlideIndex);
+        }
+
+        lightboxMedia.innerHTML = '';
+
+        if (isVideo) {
+            const video = document.createElement('video');
+            video.className = 'lightbox-video';
+            video.autoplay = true;
+            video.muted = true;
+            video.loop = true;
+            video.playsInline = true;
+            video.controls = false;
+            video.poster = media.poster || '';
+            video.setAttribute('playsinline', '');
+            video.setAttribute('webkit-playsinline', '');
+            video.setAttribute('loop', '');
+            video.setAttribute('muted', '');
+            video.setAttribute('autoplay', '');
+
+            const source = media.querySelector('source');
+            if (source) {
+                video.src = source.src;
+            } else if (media.getAttribute('src')) {
+                video.src = media.getAttribute('src');
+            }
+
+            lightboxMedia.appendChild(video);
+            video.play().catch(() => {});
+        } else {
+            const img = document.createElement('img');
+            img.className = 'lightbox-img';
+            img.src = media.src;
+            img.alt = media.alt || 'Imagem Expandida';
+            lightboxMedia.appendChild(img);
+        }
+
+        lightbox.classList.add('active');
+    }
+
+    prevBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showLightboxMedia(lightbox.currentIndex - 1, lightbox.currentContext);
+    });
+
+    nextBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        showLightboxMedia(lightbox.currentIndex + 1, lightbox.currentContext);
+    });
+
+    lightbox._showMedia = showLightboxMedia;
+    lightbox.currentIndex = 0;
+    lightbox.currentContext = null;
+
+    const mediaItems = document.querySelectorAll('.slide-grid img, .slide-grid video');
+    mediaItems.forEach((media) => {
+        media.style.cursor = 'pointer';
+        media.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const context = getSliderContext(media);
+            const visibleIndex = context.mediaList.indexOf(media);
             if (visibleIndex !== -1) {
-                lightbox._showImage(visibleIndex);
-                lightbox.classList.add('active');
+                lightbox._showMedia(visibleIndex, context);
             }
         });
     });

@@ -837,7 +837,7 @@ footer {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.95);
+    background: rgba(0, 0, 0, 0.9);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -845,6 +845,8 @@ footer {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
+    padding: 2rem;
+    box-sizing: border-box;
 }
 
 #lightbox.active {
@@ -854,15 +856,35 @@ footer {
 
 .lightbox-content {
     position: relative;
-    max-width: 90vw;
+    max-width: min(90vw, 900px);
     max-height: 90vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.lightbox-img {
+.lightbox-media {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: min(90vw, 900px);
+}
+
+.lightbox-img,
+.lightbox-video {
     max-width: 100%;
-    max-height: 90vh;
+    max-height: 80vh;
+    width: auto;
+    height: auto;
     object-fit: contain;
     display: block;
+    background: #000;
+    border-radius: 8px;
+}
+
+.lightbox-video {
+    width: min(90vw, 900px);
+    max-height: 80vh;
 }
 
 .lightbox-close {
