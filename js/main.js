@@ -95,6 +95,18 @@ const projetos = [
         formato: "horizontal",
         thumb: "./gravacao/producao-clip/assets/thumb.jpg",
         link: "./gravacao/producao-clip/index.html"
+    },
+    {
+        id: "ABA_MOTION_002",
+        titulo: "Efeito elasrtic aplicado",
+        categoria: "Motion design",
+        ferramentas: "After Effects, Illustrator, Premiere Pro",
+        desc_curta: "Algumas animações que fiz para colocar em um video do youtube.",
+        destaque: true,
+        ativo: true,
+        formato: "horizontal",
+        thumb: "./motion-design/ABA_MOTION_002/assets/ABA-002_MOTION_001.mp4",
+        link: "./motion-design/ABA_MOTION_002/index.html"
     }
 ];
 
@@ -157,6 +169,28 @@ function updateActiveFilter(category) {
     });
 }
 
+function isVideoUrl(url) {
+    return /\.(mp4|webm|ogg|mov)$/i.test(url || '');
+}
+
+function renderMediaPreview(project, mediaClass) {
+    const isVideo = isVideoUrl(project.thumb);
+
+    if (isVideo) {
+        return `
+            <video class="${mediaClass}" autoplay loop muted playsinline preload="metadata" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <source src="${project.thumb}" type="video/mp4">
+            </video>
+            <div class="placeholder-text" style="display: none;">[ Inserir Mídia: ${project.thumb} ]</div>
+        `;
+    }
+
+    return `
+        <img src="${project.thumb}" alt="${project.titulo}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="placeholder-text" style="display: none;">[ Inserir Mídia: ${project.thumb} ]</div>
+    `;
+}
+
 function renderProjects(category) {
     elements.featured.innerHTML = '';
     elements.grid.innerHTML = '';
@@ -175,8 +209,7 @@ function renderProjects(category) {
     elements.featured.innerHTML = `
         <a href="${featuredProject.link}" class="featured-card ${isFeaturedVertical ? 'vertical' : ''}">
             <div class="featured-thumb">
-                <img src="${featuredProject.thumb}" alt="${featuredProject.titulo}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <div class="placeholder-text" style="display: none;">[ Inserir Mídia: ${featuredProject.thumb} ]</div>
+                ${renderMediaPreview(featuredProject, 'featured-media')}
             </div>
             <div class="featured-info">
                 <span class="badge">${featuredProject.categoria}</span>
@@ -201,8 +234,7 @@ function renderProjects(category) {
             <a href="${p.link}" class="card ${isVertical ? 'card-vertical' : ''}">
                 <div class="card-content-wrapper">
                     <div class="card-thumb">
-                        <img src="${p.thumb}" alt="${p.titulo}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <div class="placeholder-text" style="display: none;">[ Mídia ${isVertical ? 'Vertical' : 'Horizontal'}: ${p.thumb} ]</div>
+                        ${renderMediaPreview(p, 'card-media')}
                     </div>
                     <div class="card-info">
                         <span class="badge">${p.categoria}</span>
